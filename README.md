@@ -47,3 +47,7 @@ just test       # run all tests
 ## Licence
 
 MIT OR Apache-2.0
+
+thanks 
+
+Conor
