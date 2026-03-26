@@ -1,6 +1,31 @@
 use crate::types::{OptionType, OptionsData, OptionsResult};
 use crate::utils::norm_cdf;
 
+
+/// Prices a European option using the Black-Scholes-Merton model.
+///
+/// # Arguments
+/// * `option` - Market data and contract parameters
+///
+/// # Example
+/// ```
+/// use quant_core::types::{OptionsData, OptionType};
+/// use quant_core::models::derivatives::black_scholes;
+///
+/// let option = OptionsData {
+///     spot: 100.0,
+///     strike: 100.0,
+///     time: 1.0,
+///     risk_free_rate: 0.05,
+///     dividend: 0.02,
+///     sigma: 0.2,
+///     option_type: OptionType::Call,
+/// };
+/// let result = black_scholes::price(&option);
+/// ```
+
+
+
 pub fn price(option: &OptionsData) -> OptionsResult {
 
     let spot = option.spot;
