@@ -1,0 +1,28 @@
+# Rust build output
+target/
+Cargo.lock      # leave this out for libraries (keep for binaries)
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+dist/
+build/
+*.egg-info/
+.venv/
+.uv/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rcheck/
+
+# Editor
+.DS_Store       # Mac
+.vscode/
+.idea/
+
+# Maturin / PyO3 build output
+py-quant/target/

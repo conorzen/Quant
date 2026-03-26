@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+"core",
+#"py-quant",
+#"r-quant",
+]
+
+resolver = "2"

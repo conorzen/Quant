@@ -1,0 +1,10 @@
+[package]
+name = "quant-core"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "quant_core"
+crate-type = ["lib", "cdylib"]
+
+[dependencies]
