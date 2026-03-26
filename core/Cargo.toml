@@ -8,3 +8,4 @@ name = "quant_core"
 crate-type = ["lib", "cdylib"]
 
 [dependencies]
+libm = "0.2.16"
