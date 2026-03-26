@@ -6,8 +6,7 @@ A high-performance quantitative finance library built in Rust, with Python and R
 
 `quant-core` provides fast, reliable implementations of common quantitative finance models including derivatives pricing, stochastic processes, and statistical tools.
 
-![Crates.io](https://img.shields.io/crates/v/quant-core)
-![docs.rs](https://img.shields.io/docsrs/quant-core)
+
 ![CI](https://github.com/conorzen/quant-core/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
  
