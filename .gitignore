@@ -1,6 +1,7 @@
 # Rust build output
 target/
 Cargo.lock      # leave this out for libraries (keep for binaries)
+criterion/
 
 # Python
 __pycache__/

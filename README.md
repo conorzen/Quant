@@ -6,6 +6,25 @@ A high-performance quantitative finance library built in Rust, with Python and R
 
 `quant-core` provides fast, reliable implementations of common quantitative finance models including derivatives pricing, stochastic processes, and statistical tools.
 
+## Performance
+
+Benchmarked on Apple M-series via `cargo bench`:
+
+| Benchmark | Time |
+|---|---|
+| Single option price | 13.2 ns |
+| 10,000 options | 218.5 µs |
+
+Approximately 75 million option prices per second.
+```
+
+---
+
+## The Outliers
+```
+15 outliers among 100 measurements
+
+
 
 ![CI](https://github.com/conorzen/quant-core/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
