@@ -1,0 +1,22 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "quantbridge"
+version = "0.1.0"
+description = "Fast financial analytics powered by Rust"
+requires-python = ">=3.8"
+license = { text = "MIT OR Apache-2.0" }
+authors = [{ name = "Conor Reid", email = "reidconor06@gmail.com" }]
+keywords = ["quantitative-finance", "derivatives", "options", "black-scholes"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[tool.maturin]
+module-name = "quantbridge"
+features = ["pyo3/extension-module"]
+bindings = "pyo3"

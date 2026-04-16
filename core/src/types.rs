@@ -22,4 +22,5 @@ pub struct OptionsResult {
     pub gamma: f64,
     pub vega: f64,
     pub theta: f64,
+    pub rho: f64,
 }

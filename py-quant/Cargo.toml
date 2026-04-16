@@ -1,0 +1,19 @@
+[package]
+name = "quantbridge"
+version = "0.1.0"
+edition = "2024"
+description = "Python bindings for quant-core — fast financial analytics powered by Rust"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/conorzen/quant-core"
+homepage = "https://github.com/conorzen/quant-core"
+authors = ["Conor Reid <reidconor06@gmail.com>"]
+keywords = ["quantitative-finance", "derivatives", "black-scholes", "options", "python"]
+categories = ["mathematics", "science", "algorithms"]
+
+[lib]
+name = "quantbridge"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module", "abi3-py38"] }
+quant-core = { path = "../core" }
