@@ -1,11 +1,13 @@
 use crate::types::{OptionType, OptionsData, OptionsResult};
-use crate::utils::norm_cdf;
+use crate::utils::{norm_cdf, norm_pdf};
 
-
-/// Prices a European option using the Black-Scholes-Merton model.
+/// Prices a European option using the Black-Scholes-Merton model and computes all Greeks.
 ///
 /// # Arguments
 /// * `option` - Market data and contract parameters
+///
+/// # Returns
+/// `OptionsResult` with price, delta, gamma, vega, theta (per calendar day), and rho.
 ///
 /// # Example
 /// ```
@@ -23,11 +25,7 @@ use crate::utils::norm_cdf;
 /// };
 /// let result = black_scholes::price(&option);
 /// ```
-
-
-
 pub fn price(option: &OptionsData) -> OptionsResult {
-
     let spot = option.spot;
     let strike = option.strike;
     let time = option.time;
@@ -35,26 +33,89 @@ pub fn price(option: &OptionsData) -> OptionsResult {
     let sigma = option.sigma;
     let dividend = option.dividend;
 
+    let sqrt_t = time.sqrt();
     let d1 = ((spot / strike).ln() + (rate - dividend + 0.5 * sigma * sigma) * time)
-        / (sigma * time.sqrt());
-    let d2 = d1 - sigma * time.sqrt();
+        / (sigma * sqrt_t);
+    let d2 = d1 - sigma * sqrt_t;
 
-    let options_price = match option.option_type {
+    let exp_qt = (-dividend * time).exp();
+    let exp_rt = (-rate * time).exp();
+    let nd1_pdf = norm_pdf(d1);
+
+    let price = match option.option_type {
+        OptionType::Call => spot * exp_qt * norm_cdf(d1) - strike * exp_rt * norm_cdf(d2),
+        OptionType::Put => strike * exp_rt * norm_cdf(-d2) - spot * exp_qt * norm_cdf(-d1),
+    };
+
+    let delta = match option.option_type {
+        OptionType::Call => exp_qt * norm_cdf(d1),
+        OptionType::Put => -exp_qt * norm_cdf(-d1),
+    };
+
+    let gamma = exp_qt * nd1_pdf / (spot * sigma * sqrt_t);
+
+    // Vega: sensitivity to 1% change in volatility
+    let vega = spot * exp_qt * nd1_pdf * sqrt_t / 100.0;
+
+    // Theta: daily decay (per calendar day)
+    let theta = match option.option_type {
         OptionType::Call => {
-            spot * (-dividend * time).exp() * norm_cdf(d1)
-                - strike * (-rate * time).exp() * norm_cdf(d2)
+            (-spot * exp_qt * nd1_pdf * sigma / (2.0 * sqrt_t)
+                - rate * strike * exp_rt * norm_cdf(d2)
+                + dividend * spot * exp_qt * norm_cdf(d1))
+                / 365.0
         }
         OptionType::Put => {
-            strike * (-rate * time).exp() * norm_cdf(-d2)
-                - spot * (-dividend * time).exp() * norm_cdf(-d1)
+            (-spot * exp_qt * nd1_pdf * sigma / (2.0 * sqrt_t)
+                + rate * strike * exp_rt * norm_cdf(-d2)
+                - dividend * spot * exp_qt * norm_cdf(-d1))
+                / 365.0
         }
     };
 
-    OptionsResult {
-        price: options_price,
-        delta: 0.0, 
-        gamma: 0.0,
-        vega:  0.0,
-        theta: 0.0,
+    let rho = match option.option_type {
+        OptionType::Call => strike * time * exp_rt * norm_cdf(d2) / 100.0,
+        OptionType::Put => -strike * time * exp_rt * norm_cdf(-d2) / 100.0,
+    };
+
+    OptionsResult { price, delta, gamma, vega, theta, rho }
+}
+
+/// Solves for implied volatility using Newton-Raphson iteration.
+///
+/// # Arguments
+/// * `option`       - Contract parameters (sigma field is used as the initial guess)
+/// * `market_price` - Observed market price of the option
+///
+/// # Returns
+/// `Some(sigma)` if converged within `max_iterations`, `None` otherwise.
+pub fn implied_volatility(option: &OptionsData, market_price: f64) -> Option<f64> {
+    const MAX_ITERATIONS: u32 = 100;
+    const TOLERANCE: f64 = 1e-6;
+    const MIN_VEGA: f64 = 1e-10;
+
+    let mut sigma = option.sigma.max(0.01); // ensure positive starting point
+
+    for _ in 0..MAX_ITERATIONS {
+        let trial = OptionsData { sigma, ..option.clone() };
+        let result = price(&trial);
+        let diff = result.price - market_price;
+
+        if diff.abs() < TOLERANCE {
+            return Some(sigma);
+        }
+
+        // vega stored as per-1%, convert back to raw for the NR step
+        let raw_vega = result.vega * 100.0;
+        if raw_vega.abs() < MIN_VEGA {
+            return None;
+        }
+
+        sigma -= diff / raw_vega;
+        if sigma <= 0.0 {
+            sigma = 1e-4;
+        }
     }
+
+    None
 }

@@ -2,7 +2,7 @@
 
 members = [
 "core",
-#"py-quant",
+"py-quant",
 #"r-quant",
 ]
 
